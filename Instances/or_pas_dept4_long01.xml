@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<OrPasu_instance xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.diegm.uniud.it/ceschia/uploads/XML/OrPasu_instance.xsd" name="OR_PASU130723-050129">
+<OrPasu_instance xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://bitbucket.org/satt/or-pas/raw/master/OrPasInstance.xsd" name="OR_PASU130723-050129">
   <descriptor>
     <Departments>4</Departments>
     <Rooms>50</Rooms>
