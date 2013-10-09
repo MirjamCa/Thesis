@@ -15,8 +15,8 @@ The files `HC_classes.php` and `HC_Data.php` are necessary to run the generator.
 
 Generated instances are stored in folder Instances. They are split into 5 families with the following main features:
 
-| Family |	Rooms	| Departments	| Patients	| Days |
-| :------| ------:  | ------:| ------:| ------:| 
+| Family | Rooms | Departments | Patients | Days |
+| :------| ------:| ------:| ------:| ------:| 
 | Short1 |	25 |	2 |	440 	| 14 |
 | Short2 |	50 |	4 |	640 	| 14 |
 | Short3 |	75 |	6 |	1400 	| 14 |
@@ -29,7 +29,7 @@ Generated instances are stored in folder Instances. They are split into 5 famili
 ### Results of the dynamic (regular) solver in its best configuration
 
 | Instance | Avg     | Dev     | Med     | Best    |
-| :------  | ------: | ------: | ------: | ------: |
+| :------  | ---------:|  ---------:|  ---------:|  ---------: |
 | or-dept2_short00 | 63470.0  | 552.2 | 63371 | 62503 | 
 | or-dept2_short01 | 95704.0  | 630.3 | 95707 | 94660 |
 | or-dept2_short02 | 55218.1  | 287.4 | 55218 | 54380 |
@@ -104,4 +104,4 @@ Best solutions are available from the folders DynamicSolutions and StaticSolutio
 
 ## Validator
 
-The solution validator is available as a C++ source file in `or_pas_validator`. The compilation command is provided on top of the file as a comment. The library libxml++ needs to be installed.
+The solution validator is available as a C++ source file in `or_pas_validator.cc`. The compilation command is provided on top of the file as a comment. The library libxml++ needs to be installed.
