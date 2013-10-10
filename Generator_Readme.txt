@@ -22,11 +22,11 @@
      - R package
     -------------------------------------------------------------------------------------------------------------------------------------------
     Usage:
-    To generate an instance, just run:
+    The files HC_classes.php and HC_Data.php are necessary to run the generator. To generate an instance, just run:
 
     ./generatorXML.php <num_departments> <num_rooms> <num_features> <num_patients> <num_days> <num_or_rooms>
 
-    Each instance is validated against the XML schema "OrPasu_instance.xsd" and then printed in the standard output.
+    Each instance is validated against the XML schema "OrPasInstance.xsd" and then printed in the standard output.
     -------------------------------------------------------------------------------------------------------------------------------------------
     Data:
     All the data necessary to generate an instance (statistical distributions, specialism types, treatments, ...), but not the one given as input, 

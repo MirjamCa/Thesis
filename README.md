@@ -13,7 +13,8 @@ The files `HC_classes.php` and `HC_Data.php` are necessary to run the generator.
 
 ##Instances
 
-Generated instances are stored in folder Instances. They are split into 5 families with the following main features:
+Generated instances are stored in folder Instances. Each instance is validated again the OrPasInstance.xsd XML schema. 
+They are split into 5 families with the following main features:
 
 | Family | Rooms | Departments | Patients | Days |
 | :------| ------:| ------:| ------:| ------:| 
@@ -101,6 +102,7 @@ Generated instances are stored in folder Instances. They are split into 5 famili
 ## Solutions
 
 Best solutions are available from the folders DynamicSolutions and StaticSolutions for the two solvers, respectively.
+Each solution is validated against the OrPasSolution.xsd XML schema.
 
 ## Validator
 
