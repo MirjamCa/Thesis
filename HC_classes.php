@@ -78,10 +78,12 @@ class Treatment
   */
   public function SampleLogNormalDistribution($mean, $sd)
   {
-    $R_command_line = "R --vanilla -q --slave -e 'rlnorm(1, mean=". $mean . ", sd=" . $sd . ")'"; 
+    //Scale the values ($mean and $sd refer to the underlying normal distribution)
+    $ln_mean = log($mean*$mean/sqrt($sd*$sd+$mean*$mean));
+    $ln_sd = sqrt(log(1+($sd*$sd/($mean*$mean))));	 
+    $R_command_line = "R --vanilla -q --slave -e 'rlnorm(1, mean=". $ln_mean . ", sd=" . $ln_sd . ")'"; 
     $time_string = exec($R_command_line);
     list($s,$time) = explode(' ', $time_string);
-    $time = log($time);
     settype($time, "integer");
     return $time; 
   }

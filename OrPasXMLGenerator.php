@@ -95,7 +95,7 @@ $daily_surgery_occupancy = array_fill(0,$days, 0);
 
 //Instance generation: to generate the instance in XML we use the DOMDOCUMENT class
 
-$schema_file = "OrPasu_instance.xsd";
+$schema_file = "OrPasInstance.xsd";
 $instance_name = "OR_PASU" . date('ymd-his');
 $document = new DOMDocument('1.0', 'UTF-8');
 $document->xmlStandalone = false;
@@ -106,7 +106,7 @@ $document->appendChild($instance);
 
 $document->createAttributeNS( 'http://www.w3.org/2001/XMLSchema-instance', 'xsi:attr' );
  
-$instance->setAttribute("xsi:schemaLocation", "http://www.diegm.uniud.it/ceschia/uploads/XML/OrPasu_instance.xsd");
+$instance->setAttribute("xsi:schemaLocation", "https://bitbucket.org/satt/or-pas/raw/master/OrPasInstance.xsd");
 $instance->setAttribute("name", $instance_name);
 
 //Descriptor
