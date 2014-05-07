@@ -1,10 +1,10 @@
-// or_pasu_validator.cc file
-// version: 0.0
-// date: Oct 7, 2013
+// or_pas_validator.cc file
+// version: 1.0
+// date: May 4, 2014
 // author: Sara Ceschia & Andrea Schaerf
 // OS: ubuntu linux
-// compile with: g++ -Wall -O3 -I/usr/include/libxml2 -I/usr/include/glibmm-2.4 -I/usr/lib/x86_64-linux-gnu/glibmm-2.4/include -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/libxml++-2.6 -I/usr/lib/libxml++-2.6/include -o or_pasu_validator or_pasu_validator.cc -lxml++-2.6 -lglibmm-2.4
-// run with: or_pasu_validator <instance_file> <solution_file>
+// compile with: g++ -Wall -O3 -I/usr/include/libxml2 -I/usr/include/glibmm-2.4 -I/usr/lib/x86_64-linux-gnu/glibmm-2.4/include -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/libxml++-2.6 -I/usr/lib/libxml++-2.6/include -o or_pas_validator or_pas_validator.cc -lxml++-2.6 -lglibmm-2.4
+// run with: or_pas_validator <instance_file> <solution_file>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -24,8 +24,8 @@ enum Request {NEEDED, PREFERRED, DONT_CARE};
 enum DoctoringLevel {COMPLETE, PARTIAL, NONE};
 enum PatientStatus {UNREGISTERED, REGISTERED, ARRIVED, DISCHARGED};
 
-const string instance_xml_schema = "OrPasu_instance.xsd";
-const string output_xml_schema = "OrPasu_main_out.xsd"; 
+const string instance_xml_schema = "OrPasInstance.xsd";
+const string output_xml_schema = "OrPasSolution.xsd"; 
 
 class Room 
 {
