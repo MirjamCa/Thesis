@@ -1,8 +1,8 @@
 #!/usr/bin/php -q
-   <?php
+<?php
    /*
      -------------------------------------------------------------------------------------------------------------------------------------------
-     This file is part of the instance generator used in:
+     This file is part of the instance generator used in
  
      - Ceschia S. and Schaerf A. The Dynamic Patient Admission Scheduling with Operating Room Constraints, Flexible Horizon, and Patient Delays. 
      6th Multidisciplinary International Scheduling Conference (MISTA '13), 27-30 August 2013, Gent, Belgium.
@@ -15,7 +15,7 @@
      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
      GNU General Public License for more details.
 
-     Copyright (C) 2013 SaTT Group, DIEGM, University of Udine. 
+     Copyright (C) 2014 SaTT Group, DIEGM, University of Udine. 
    */
 date_default_timezone_set('Europe/Rome');
 
@@ -25,6 +25,7 @@ if ($argc < 7)
     exit(1);
   }
 
+
 // Reads the date from the command line input
 $departments = $argv[1]; // number of departments
 $rooms = $argv[2]; // number of rooms
@@ -33,8 +34,10 @@ $patients = $argv[4]; // number of patients
 $days = $argv[5]; // number of days of the planning horizon
 $or_rooms = $argv[6]; // number of operating rooms
 
+
 include "HC_classes.php"; 
 include "HC_data.php"; 
+
 
 //    ----------------------------------------------------------------------------------------------------------------------------------------
 // Creates distributions for specialisms and departments
@@ -79,7 +82,7 @@ $day_spec_surgical_assignments_incumbent = array();  // total duration of the as
 //Initialization of arrays
  for($k = 0; $k < $days; $k++)
   {
-    $day_name = CreateDateFromToday($today, $d); 
+    $day_name = CreateDateFromToday($today, $k); 
     foreach($surgical_specialisms as $spec_name => $specialism)
       {
 	$day_spec_surgical_assignments[$day_name][$spec_name] = 0;
@@ -92,6 +95,7 @@ $total_capacity = 0;
 $total_occupancy = 0;
 $daily_occupancy = array_fill(0,$days, 0);
 $daily_surgery_occupancy = array_fill(0,$days, 0);
+$avg_num_patients_day = ceil($patients/$days);
 
 //Instance generation: to generate the instance in XML we use the DOMDOCUMENT class
 
@@ -116,7 +120,8 @@ $instance->appendChild($descriptor);
 $descriptor->appendChild($document->createElement("Departments", $departments));
 $descriptor->appendChild($document->createElement("Rooms", $rooms));
 $descriptor->appendChild($document->createElement("Features", $features));
-$descriptor->appendChild($document->createElement("Patients", $patients));
+$pat_node = $document->createElement("Patients", $patients);
+$descriptor->appendChild($pat_node);
 $descriptor->appendChild($document->createElement("Specialisms", $specialisms));
 
 $horizon_entry = $document->createElement("Horizon");
@@ -260,60 +265,74 @@ $or_slots_entry = $document->createElement("or_slots");
 $instance->appendChild($or_slots_entry);
 $or_slots_entry->setAttribute("slot_length", $slot_length);
 
-// The MSS is created through a routine that assigns OR-slots to specialism trying to follow the surgical specialism distributions and to have approximately the same number of OR-slots each day. The timetable is created just for a period and then repeated for the whole planning horizon.
+// The MSS is created through a routine that assigns OR-slots to specialism following the surgical specialism distributions. The timetable is created just for a period and then repeated for the whole planning horizon.
 
-$spec_slots_ass = array(); // target number of slots to assign to a specialism in period 
+$spec_slots_ass = array(); // target number of slots to assign to a specialism in period following the surgical specialism distributions
+$slots = array(); // slots to assign 
+$day_slots = array(); // slots free in each day
 $day_spec_slots = array(); // slots assigned to a specialism in a day
 
+//Inizialization of data structures
+for($d = 0;  $d<$days; $d++)
+  {
+    $day_name = CreateDateFromToday($today, $d);
+    foreach($surgical_specialisms as $spec_name => $specialism)
+      $day_spec_slots[$day_name][$spec_name] = 0;
+  }
+
+for($k = 0; $k < min($MSS_periodicity, $days); $k++)
+  if(IsWorkingDay(CreateDateFromToday($today, $k)))
+    $day_slots[$k] = $ors_day_slots;
+  else
+    $day_slots[$k] = 0;
+
+$k = 0;
+
+//Assignment of OR slots to specialism according to the specialism distribution
 foreach($surgical_specialisms as $spec_name => $specialism)
-  $spec_slots_ass[$spec_name] = floor($surgical_specialisms_distribution[$spec_name]*$ors_day_slots*$MSS_periodicity/array_sum($surgical_specialisms_distribution));
+  {
+    $spec_slots_ass[$spec_name] = floor($surgical_specialisms_distribution[$spec_name]/array_sum($surgical_specialisms_distribution)*$ors_day_slots*$num_working_days);
+    if($spec_slots_ass[$spec_name] == 0)//Each surgical specialism has at least 1 slot
+      $spec_slots_ass[$spec_name] = 1;
+  }
 
-do{
-  $spec_slots = array(); // slots assigned to a specialism
-  $nwd_counter = 0; // counter of the working days
-  for($k = 0; $k < min($MSS_periodicity, $days); $k++)
+// To assign all the available slots to the specialisms
+while($ors_day_slots*$num_working_days > array_sum($spec_slots_ass))
+  {
+    $spec_name = SelectFromDistribution($surgical_specialisms_distribution);
+    $spec_slots_ass[$spec_name]++;
+  }
+
+foreach($surgical_specialisms as $spec_name => $specialism) 
+  for($i = 0; $i < $spec_slots_ass[$spec_name]; $i++)
     {
-      $day_name = CreateDateFromToday($today, $k); 
-      do{	
-	foreach($surgical_specialisms as $spec_name => $specialism)
-	  {
-	    if(IsWorkingDay($day_name))
-	      {
-		$avg_slots_spec = $spec_slots_ass[$spec_name]/($num_working_days-$nwd_counter); // number of remaining working days in a week
-		$n = rand(round(max(0, $avg_slots_spec - 0.5*$avg_slots_spec)), round(min($avg_slots_spec + 1.0*$avg_slots_spec, $ors_day_slots)));
- 
-		if(($n > 0) && ($n*$slot_length)/($specialism->mean_surgical_duration+$specialism->sd_surgical_duration) < 1)
-		  $n = ceil($specialism->mean_surgical_duration/($n*$slot_length)); 
-
-		$num_blocks = min($n, $spec_slots_ass[$spec_name]); 
-		settype($num_blocks, "integer");	       
-	      } 
-	    else
-	      $num_blocks = 0;
-	      
-	    $day_spec_slots[$day_name][$spec_name] = $num_blocks;
-	  }
-      }while(IsWorkingDay($day_name) && (array_sum($day_spec_slots[$day_name]) > $ors_day_slots + $or_rooms || array_sum($day_spec_slots[$day_name]) < $ors_day_slots - $or_rooms)); // to have a number of slots in a day which is not very different than $ors_day_slots
-
-      foreach($surgical_specialisms as $spec_name => $specialism)
-	{
-	  if(isset($spec_slots[$spec_name]))
-	    $spec_slots[$spec_name] += $day_spec_slots[$day_name][$spec_name];
-	  else
-	    $spec_slots[$spec_name] = $day_spec_slots[$day_name][$spec_name];
-	  $spec_slots_ass[$spec_name] -= $day_spec_slots[$day_name][$spec_name]; 
-	}
-      if(IsWorkingDay($day_name))
-	$nwd_counter++;	
+      $slots[$k] =  $spec_name;
+      $k++;
     }
 
-  // Checks that each surgical specialism has at least 1 slot
-  $one_slot_condition = true;
-  foreach($spec_slots as $spec_name => $num_slots)
-    if($num_slots == 0)
-      $one_slot_condition = false;
 
-}while($one_slot_condition == false);
+// Greedy algorithm that creates the MSS: it randomly selects a slot of a specialism and it assigns to it the emptier day
+
+while(count($slots) > 0)
+  {
+    $ss = rand(0, count($slots)-1); // It randomly selects a slot not already assigned
+    // It looks for the emptier day
+    $max = 0;
+    $d = 0;
+    for($k = 0; $k < count($day_slots); $k++)
+      {
+	if($day_slots[$k] > $max)
+	  {
+	    $max = $day_slots[$k];
+	    $d = $k;
+	  }	  
+      }
+    $day_name = CreateDateFromToday($today, $d);
+      $day_spec_slots[$day_name][$slots[$ss]]++;
+    unset($slots[$ss]);
+    $slots = array_values($slots);
+    $day_slots[$d]--;
+  }
 
 // Repeat the MSS for all the planning horizon
 for($k = $MSS_periodicity; $k < $days; $k++) 
@@ -321,7 +340,7 @@ for($k = $MSS_periodicity; $k < $days; $k++)
     $original_day_name = CreateDateFromToday($today, $k%$MSS_periodicity);
     $day_name = CreateDateFromToday($today, $k); 	    
     foreach($surgical_specialisms as $spec_name => $specialism)
-      $day_spec_slots[$day_name][$spec_name] = $day_spec_slots[$original_day_name][$spec_name];
+ 	$day_spec_slots[$day_name][$spec_name] = $day_spec_slots[$original_day_name][$spec_name];
   }
 
 // Write the xml entries
@@ -337,7 +356,7 @@ foreach($day_spec_slots as $day_name => $day_assignment)
 	    $specialism_entry = $document->createElement("specialism_assignment");
 	    $day_entry->appendChild($specialism_entry);
 	    $specialism_entry->setAttribute("name", $spec_name);
-	    $specialism_entry->setAttribute("number_or_slots", $slots);	  //1 slot = 120 minutes
+	    $specialism_entry->setAttribute("number_or_slots", $slots);	  //1 slot = 180 minutes
 
 	  }
       }
@@ -349,208 +368,230 @@ foreach($day_spec_slots as $day_name => $day_assignment)
 $patients_entry = $document->createElement("patients");
 $instance->appendChild($patients_entry);
 
-for($i = 0; $i < $patients; $i++)
+$tot_patients = 0;
+for($k = 0; $k < $days; $k++)
   {
-    $patient_name = "Pat_" . $i;
+    $npd = SamplePoissonDistribution($avg_num_patients_day);
 
-    $age = rand(1,$max_age);
-    if (rand(0,1))
-      $gender = "Female";
-    else
-      $gender = "Male";
-    
-    $patient_entry = $document->createElement("patient");
-    $patients_entry->appendChild($patient_entry);
-
-    $patient_entry->setAttribute("name", $patient_name);
-    $patient_entry->setAttribute("age", $age);	  
-    $patient_entry->setAttribute("gender", $gender);	  
- 
-    do{
-      /** 
-	  Other conditions about patients and specialisms:
-	  - no urological_surgery_spec for females
-	  - no gynaecology_spec for males
-	  - no pediatrics_spec for adults
-	  - no neonatology_spec for people over 1 year
-	  - no elderly_care up to 64 years
-      */
-      do
-	$specialism = SelectFromDistribution($specialisms_distribution);
-      while(
-	    ($specialism == "Urological_Surgery" && $gender == "Female") ||
-	    ($specialism == "Gynaecology" && $gender == "Male") ||
-	    ($specialism == "Pediatrics" && $age > 16) ||
-	    ($specialism == "Neonatology" && $age > 1) ||
-	    ($specialism == "Elderly_Care" && $age < 65)
-	    );
-
-      if($specialisms_list[$specialism]->IsSurgical() && $specialisms_list[$specialism]->IsMedical())
-	{
-	  $surgical_patient =  (rand(1,100) <= $prob_surgery) ? 1 : 0;
-	  if($surgical_patient)
-	    {
-	      $treatment = rand(0,$specialisms_list[$specialism]->NumSurgicalTreatments()-1); 
-	      $treat = $specialisms_list[$specialism]->GetSurgicalTreatment($treatment); 
-	    }
-	  else
-	    {
-	      $treatment = rand(0,$specialisms_list[$specialism]->NumMedicalTreatments()-1);
-	      $treat = $specialisms_list[$specialism]->GetMedicalTreatment($treatment);
-	    }
-	}
-      else if($specialisms_list[$specialism]->IsSurgical())
-	{
-	  $surgical_patient = 1; 
-	  $treatment = rand(0,$specialisms_list[$specialism]->NumSurgicalTreatments()-1);
-	  $treat = $specialisms_list[$specialism]->GetSurgicalTreatment($treatment);
-	}
-      else
-	{
-	  $surgical_patient = 0; 
-	  $treatment = rand(0,$specialisms_list[$specialism]->NumMedicalTreatments()-1);
-	  $treat = $specialisms_list[$specialism]->GetMedicalTreatment($treatment);
-	}
-
- 
-      $urgent_patient =  (rand(1,100) <= $prob_urgency) ? 1 : 0;
-      $treat_time = ($surgical_patient == true) ? $treat->surgery_length : 0;	  
-  
-      // Note: surgical patients and non-urgent patient can by admitted only on working days
-      if($urgent_patient && !$surgical_patient)
-	{
-	  $admission = rand(0,$days-1);
-	  $registration = $admission;
-	}
-      else
-	{
-	  do
-	    {
-	      $admission = rand(0,$days-1);
-	      $day_name = CreateDateFromToday($today, $admission);
-	    }while(!IsWorkingDay($day_name));	   
-	  $registration = rand(0, $admission);
-	}
-
-      $length = min($treat->los, $days - $admission);
-      $discharge = $admission + $length;
-      $variability = (rand(1,100) <=  $over_stay_risk) ? 1 : 0; 
-      if($surgical_patient)
-	{
-	  $day_name = CreateDateFromToday($today, $admission); 
-	      
-	  if(DayOfTheWeek($day_name) == 5) // It is Friday
-	    $surgery_day = $admission;
-	  else
-	    $surgery_day = min($admission + rand(0,1), $discharge-1);
-	}
-
-      if ($urgent_patient)
-	$max_admission = $admission;
-      else if (rand(0,9) == 0) // 10% of patients that cannot delayed more than a fix number of days (they could die in the mean time!)
-	$max_admission = rand($admission, $days - $length - 1);
-      else
-	$max_admission = -1;
-
-      if($registration < $initial_solution_days || $admission == $max_admission)
-	$incumbent_patient = true;
-      
-      if($surgical_patient)
-	{
-	  $surgery_day_name = CreateDateFromToday($today, $surgery_day); 
-
-	  // If the patient is incumbent (he/she is registered in the first days or can not be delayed) we check whether the assignment is feasible or not. Otherwise we check id there is at least one OR-slot available for the specialism in the day
-
-	  if($incumbent_patient)	    
-	    $condition = !CheckSurgicalFeasibility($day_spec_slots[$surgery_day_name][$specialism]*$slot_length, $day_spec_surgical_assignments_incumbent[$surgery_day_name][$specialism], $treat_time);
-	  else 
-	    $condition = ($day_spec_slots[$surgery_day_name][$specialism] == 0);
-	}
-      else $condition = false; 
-       
-    }while($condition);
-
-    // Update some statistics on the occupation
-    for ($j = $admission; $j < $admission + $length; $j++)
-      $daily_occupancy[$j]++;
-    $total_occupancy += $length;
-
-    $patient_entry->setAttribute("treatment",  $treat->name);	  
-
-    $capacity_preference = $available_capacities[rand(0,count($available_capacities)-1)];
-
-    // We update the assignments 
-    if($surgical_patient && $incumbent_patient)
-      $day_spec_surgical_assignments_incumbent[$surgery_day_name][$specialism] += $treat_time;
-  	
-    if($surgical_patient)
-      $day_spec_surgical_assignments[$surgery_day_name][$specialism] += $treat_time;
-    
-
-    //registration
-    $day_name = CreateDateFromToday($today, $registration);
-    $patient_entry->setAttribute("registration", $day_name);
-	  
-    //admission
-    $day_name = CreateDateFromToday($today, $admission);
-    $patient_entry->setAttribute("admission", $day_name);
-	
-    //surgery_day
-    if($surgical_patient)
+    for($ii = 0; $ii < $npd; $ii++)
       {
-	$day_name = CreateDateFromToday($today, $surgery_day);
-	$patient_entry->setAttribute("surgery_day", $day_name);
-      }	  
+	    $patient_name = "Pat_" . $tot_patients;
+	    /* echo $patient_name . " " . $ii .  "\n" ;  */
 
-    //discharge
-    $day_name = CreateDateFromToday($today, $discharge);
-    $patient_entry->setAttribute("discharge", $day_name);	  
- 
-    $patient_entry->setAttribute("variability", $variability);	  
-    if($max_admission != -1)
-      {	
-	$day_name = CreateDateFromToday($today, $max_admission);
-	$patient_entry->setAttribute("max_admission", $day_name);
-      }
-    if ($capacity_preference != $available_capacities[count($available_capacities)-1])	  
-      $patient_entry->setAttribute("preferred_capacity", $capacity_preference);	  
-
-    $room_properties_entry = $document->createElement("room_properties");
-    $patient_entry->appendChild($room_properties_entry);
-
-    // biased selection (quadratic)
-    $squared_num_features = rand(0, $features*$features);
-    $num_features = ceil(sqrt($squared_num_features));
-    if ($num_features > 0)
-      {
-	$selected_features = array();
-	for ($j = 1; $j <= $num_features; $j++)
-	  {
-	    do 
-	      $feature = rand(0,$features-1);
-	    while (array_search($feature,$selected_features) !== FALSE);
-	    $selected_features[] = $feature;
-	  }
-	sort($selected_features);
-	for ($j = 0; $j < $num_features; $j++)
-	  {
-	    $room_property_entry = $document->createElement("room_property");
-	    $room_properties_entry->appendChild($room_property_entry);
-
-	    $room_property_name = $room_property_names[$selected_features[$j]]; 
- 
-	    if($room_property_name == "television")
-	      $need = "preferred"; 
+	    $age = rand(1,$max_age);
+	    if (rand(0,1))
+	      $gender = "Female";
 	    else
-	      $need = (rand(1,100) <= $prob_needed_feature) ? "needed" : "preferred";
+	      $gender = "Male";
+    
+	    $patient_entry = $document->createElement("patient");
+	    $patients_entry->appendChild($patient_entry);
 
-	    $room_property_entry->setAttribute("name", $room_property_name);	  
-	    $room_property_entry->setAttribute("type", $need);	  
-	  }
+	    $patient_entry->setAttribute("name", $patient_name);
+	    $patient_entry->setAttribute("age", $age);	  
+	    $patient_entry->setAttribute("gender", $gender);	  
+ 
+	    do{
+	      /** 
+		  Other conditions about patients and specialisms:
+		  - no urological_surgery_spec for females
+		  - no gynaecology_spec for males
+		  - no pediatrics_spec for adults
+		  - no neonatology_spec for people over 1 year
+		  - no elderly_care up to 64 years
+	      */
+	      do
+		$specialism = SelectFromDistribution($specialisms_distribution);
+	      while(
+		    ($specialism == "Urological_Surgery" && $gender == "Female") ||
+		    ($specialism == "Gynaecology" && $gender == "Male") ||
+		    ($specialism == "Pediatrics" && $age > 16) ||
+		    ($specialism == "Neonatology" && $age > 1) ||
+		    ($specialism == "Elderly_Care" && $age < 65) ||
+		    (((DayOfTheWeek(CreateDateFromToday($today, $k)) == 6 && (($k == $days-2) ||($k == $days-1))) || 
+		      (DayOfTheWeek(CreateDateFromToday($today, $k)) == 7 && ($k == $days-1))) && $specialisms_list[$specialism]->IsSurgical()) // no surgical patients if $k is a weekend day at the end of the planning horizon
+		    );
+
+	      if($specialisms_list[$specialism]->IsSurgical() && $specialisms_list[$specialism]->IsMedical())
+		{
+		  $surgical_patient =  (rand(1,100) <= $prob_surgery) ? 1 : 0;
+		  if($surgical_patient)
+		    {
+		      $treatment = rand(0,$specialisms_list[$specialism]->NumSurgicalTreatments()-1); 
+		      $treat = $specialisms_list[$specialism]->GetSurgicalTreatment($treatment); 
+		    }
+		  else
+		    {
+		      $treatment = rand(0,$specialisms_list[$specialism]->NumMedicalTreatments()-1);
+		      $treat = $specialisms_list[$specialism]->GetMedicalTreatment($treatment);
+		    }
+		}
+	      else if($specialisms_list[$specialism]->IsSurgical())
+		{
+		  $surgical_patient = 1; 
+		  $treatment = rand(0,$specialisms_list[$specialism]->NumSurgicalTreatments()-1);
+		  $treat = $specialisms_list[$specialism]->GetSurgicalTreatment($treatment);
+		}
+	      else
+		{
+		  $surgical_patient = 0; 
+		  $treatment = rand(0,$specialisms_list[$specialism]->NumMedicalTreatments()-1);
+		  $treat = $specialisms_list[$specialism]->GetMedicalTreatment($treatment);
+		}
+
+ 
+	      $urgent_patient =  (rand(1,100) <= $prob_urgency) ? 1 : 0;
+	      $treat_time = ($surgical_patient == true) ? $treat->surgery_length : 0;	  
+  
+	      // Note: surgical patients and non-urgent patient can by admitted only on working days
+	      if($urgent_patient && !$surgical_patient)
+		{
+		  $registration = $k;
+		  $admission = $registration;
+		}
+	      else if((DayOfTheWeek(CreateDateFromToday($today, $k)) == 6 && (($k == $days-2) ||($k == $days-1))) || 
+		       (DayOfTheWeek(CreateDateFromToday($today, $k)) == 7 && ($k == $days-1)))
+		{
+		  $registration = $k;
+		  $admission = rand($k,$days-1);
+		}
+	      else
+		{
+		  $registration = $k;
+		  do
+		    {
+		      $admission = (rand(0,1) == 0) ? rand($k,min($k+7,$days-1)) : rand($k,$days-1); // Two groups: up to a week, longer
+		      $day_name = CreateDateFromToday($today, $admission);
+		    }while(!IsWorkingDay($day_name));	   
+		}
+
+	      $length = min($treat->los, $days - $admission);
+	      $discharge = $admission + $length;
+	      $variability = (rand(1,100) <=  $over_stay_risk) ? 1 : 0; 
+	      if($surgical_patient)
+		{
+		  $day_name = CreateDateFromToday($today, $admission); 
+	      
+		  if(DayOfTheWeek($day_name) == 5) // It is Friday
+		    $surgery_day = $admission;
+		  else
+		    $surgery_day = min($admission + rand(0,1), $discharge-1);
+		}
+
+	      if ($urgent_patient)
+		$max_admission = $admission;
+	      else if (rand(0,9) == 0) // 10% of patients that cannot delayed more than a fix number of days (they could die in the mean time!)
+		$max_admission = rand($admission, $days - $length - 1); 
+	      else
+		$max_admission = -1;
+
+	      if($admission == $max_admission)
+		$incumbent_patient = true;
+	      else
+		$incumbent_patient = false;
+	      if($surgical_patient)
+		{
+		  $surgery_day_name = CreateDateFromToday($today, $surgery_day); 
+
+		  // If the patient is incumbent (he/she is registered in the first days or can not be delayed) we check whether the assignment is feasible or not. Otherwise we check if there is at least one OR-slot available for the specialism in the day
+
+		  if($incumbent_patient)	    
+		    $condition = !CheckSurgicalFeasibility($day_spec_slots[$surgery_day_name][$specialism]*$slot_length, $day_spec_surgical_assignments_incumbent[$surgery_day_name][$specialism], $treat_time);
+		  else 
+		    $condition = ($day_spec_slots[$surgery_day_name][$specialism] == 0);
+		}
+	      else $condition = false; 
+       
+	    }while($condition);
+
+	    // Update some statistics on the occupation
+	    for ($j = $admission; $j < $admission + $length; $j++)
+	      $daily_occupancy[$j]++;
+	    $total_occupancy += $length;
+
+	    $patient_entry->setAttribute("treatment",  $treat->name);	  
+
+	    $capacity_preference = $available_capacities[rand(0,count($available_capacities)-1)];
+
+	    // We update the assignments 
+	    if($surgical_patient && $incumbent_patient)
+	      $day_spec_surgical_assignments_incumbent[$surgery_day_name][$specialism] += $treat_time;
+  	
+	    if($surgical_patient)
+	      $day_spec_surgical_assignments[$surgery_day_name][$specialism] += $treat_time;
+    
+
+	    //registration
+	    $day_name = CreateDateFromToday($today, $registration);
+	    $patient_entry->setAttribute("registration", $day_name);
+	  
+	    //admission
+	    $day_name = CreateDateFromToday($today, $admission);
+	    $patient_entry->setAttribute("admission", $day_name);
+	
+	    //surgery_day
+	    if($surgical_patient)
+	      {
+		$day_name = CreateDateFromToday($today, $surgery_day);
+		$patient_entry->setAttribute("surgery_day", $day_name);
+	      }	  
+
+	    //discharge
+	    $day_name = CreateDateFromToday($today, $discharge);
+	    $patient_entry->setAttribute("discharge", $day_name);	  
+ 
+	    $patient_entry->setAttribute("variability", $variability);	  
+	    if($max_admission != -1)
+	      {	
+		$day_name = CreateDateFromToday($today, $max_admission);
+		$patient_entry->setAttribute("max_admission", $day_name);
+	      }
+	    if ($capacity_preference != $available_capacities[count($available_capacities)-1])	  
+	      $patient_entry->setAttribute("preferred_capacity", $capacity_preference);	  
+
+	    $room_properties_entry = $document->createElement("room_properties");
+	    $patient_entry->appendChild($room_properties_entry);
+
+	    // biased selection (quadratic)
+	    $squared_num_features = rand(0, $features*$features);
+	    $num_features = ceil(sqrt($squared_num_features));
+	    if ($num_features > 0)
+	      {
+		$selected_features = array();
+		for ($j = 1; $j <= $num_features; $j++)
+		  {
+		    do 
+		      $feature = rand(0,$features-1);
+		    while (array_search($feature,$selected_features) !== FALSE);
+		    $selected_features[] = $feature;
+		  }
+		sort($selected_features);
+		for ($j = 0; $j < $num_features; $j++)
+		  {
+		    $room_property_entry = $document->createElement("room_property");
+		    $room_properties_entry->appendChild($room_property_entry);
+
+		    $room_property_name = $room_property_names[$selected_features[$j]]; 
+ 
+		    if($room_property_name == "television")
+		      $need = "preferred"; 
+		    else
+		      $need = (rand(1,100) <= $prob_needed_feature) ? "needed" : "preferred";
+
+		    $room_property_entry->setAttribute("name", $room_property_name);	  
+		    $room_property_entry->setAttribute("type", $need);	  
+		  }
+	      }
+	$tot_patients++;
       }
   }
 
 //$document->save("filename.xml");
+
+// The initial number of patients is corrected given that each day the arrivals are sampled from a Poisson distribution
+$pat_new_node = $document->createElement("Patients", $tot_patients);
+$descriptor->replaceChild($pat_new_node,$pat_node);
+
 
 if($document->schemaValidate($schema_file))
   echo $document->saveXML();
@@ -558,34 +599,34 @@ else
   echo "Document not valid for schema " . $schema_file;
 
 // Some statistics that can be shown to evaluate the instance
-echo "\nEND.\n";
+//echo "\nEND.\n";
 
-echo "--------------------------------------------------\n";
-echo "Total capacity = " . $total_capacity . " X " . $days . " = " . $total_capacity*$days . " beds*days\n";
-echo "Total occupancy = " . $total_occupancy . " (" . $total_occupancy/($total_capacity*$days) * 100 . "%)\n";
-echo "Daily occupancy = ";
-foreach($daily_occupancy as $day_occupancy)
-echo (int) (100 * $day_occupancy / $total_capacity) . "%, ";
-echo "\n";
+/* echo "--------------------------------------------------\n"; */
+/* echo "Total capacity = " . $total_capacity . " X " . $days . " = " . $total_capacity*$days . " beds*days\n"; */
+/* echo "Total occupancy = " . $total_occupancy . " (" . $total_occupancy/($total_capacity*$days) * 100 . "%)\n"; */
+/* echo "Daily occupancy = "; */
+/* foreach($daily_occupancy as $day_occupancy) */
+/* echo (int) (100 * $day_occupancy / $total_capacity) . "%, "; */
+/* echo "\n"; */
 
-ksort($day_spec_surgical_assignments);
+/* ksort($day_spec_surgical_assignments); */
 
-echo "Daily SPEC OR occupancy = \n";
-foreach($day_spec_surgical_assignments as $day => $spec_surgical_assignments)
-  {
-    foreach($spec_surgical_assignments as $spec => $time)
-      {
-	if($time > 0)
-	      {
- 		echo  (int) (100 * $time/($day_spec_slots[$day][$spec]*$slot_length)) . "% ";
- 		/* echo $day . " " . $spec . " " .  $time . " " . $day_spec_slots[$day][$spec] ."\n";		 */
-		$tot_OR_occupancy += 100 * $time/($day_spec_slots[$day][$spec]*$slot_length);
-		$or_active_days++;
-	      }
-      }
-    echo ", ";
-  }
-echo "\nOR average occupancy " . $tot_OR_occupancy/$or_active_days ."\n";
+/* echo "Daily SPEC OR occupancy = \n"; */
+/* foreach($day_spec_surgical_assignments as $day => $spec_surgical_assignments) */
+/*   { */
+/*     foreach($spec_surgical_assignments as $spec => $time) */
+/*       { */
+/* 	if($time > 0) */
+/* 	      { */
+/*  		echo  (int) (100 * $time/($day_spec_slots[$day][$spec]*$slot_length)) . "% "; */
+/*  		/\* echo $day . " " . $spec . " " .  $time . " " . $day_spec_slots[$day][$spec] ."\n";		 *\/ */
+/* 		$tot_OR_occupancy += 100 * $time/($day_spec_slots[$day][$spec]*$slot_length); */
+/* 		$or_active_days++; */
+/* 	      } */
+/*       } */
+/*     echo ", "; */
+/*   } */
+/* echo "\nOR average occupancy " . $tot_OR_occupancy/$or_active_days ."\n"; */
 
  
 function SelectFromDistribution($distribution)

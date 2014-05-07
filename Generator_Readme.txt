@@ -1,11 +1,11 @@
    /*
-     OR_PASU_Generator version 1.0 September 4, 2013.
+     OR_PASU_Generator version 2.0 May 4, 2014.
      -------------------------------------------------------------------------------------------------------------------------------------------
      Licence:
       These files implement the instance generator used in:
  
      - Ceschia S. and Schaerf A. The Dynamic Patient Admission Scheduling with Operating Room Constraints, Flexible Horizon, and Patient Delays. 
-     Submitted for publication.
+     6th Multidisciplinary International Scheduling Conference (MISTA '13), 27-30 August 2013, Gent, Belgium.
 
      The generator is able to produce test cases of different dimensions and features, that are given as input data. The instances are written 
      in XML language and are validated against the XML schema. 
@@ -15,7 +15,7 @@
      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
      GNU General Public License for more details.
 
-     Copyright (C) 2013 SaTT Group, DIEGM, University of Udine. 
+     Copyright (C) 2014 SaTT Group, DIEGM, University of Udine. 
     -------------------------------------------------------------------------------------------------------------------------------------------
      Requirements:
      - PHP

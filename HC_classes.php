@@ -1,6 +1,6 @@
 <?php
 /*
-  OR_PASU_Generator version 1.0 September 4, 2013 
+  OR_PASU_Generator version 2.0 May 4, 2014 
   -------------------------------------------------------------------------------------------------------------------------------------------
   This file is part of the instance generator used in:
  
@@ -15,7 +15,7 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 
-  Copyright (C) 2013 SaTT Group, DIEGM, University of Udine. 
+  Copyright (C) 2014 SaTT Group, DIEGM, University of Udine. 
   -------------------------------------------------------------------------------------------------------------------------------------------
 */
 
@@ -78,10 +78,10 @@ class Treatment
   */
   public function SampleLogNormalDistribution($mean, $sd)
   {
-    //Scale the values ($mean and $sd refer to the lognormal distribution, while the rlnorm function needs the scaled factors to the underlying normal distribution)
-    $mu = log($mean*$mean/sqrt($sd*$sd+$mean*$mean));
-    $sigma = sqrt(log(1+($sd*$sd/($mean*$mean))));	 
-    $R_command_line = "R --vanilla -q --slave -e 'rlnorm(1, mean=". $mu . ", sd=" . $sigma . ")'"; 
+    //Scale the values ($mean and $sd refer to the underlying normal distribution)
+    $ln_mean = log($mean*$mean/sqrt($sd*$sd+$mean*$mean));
+    $ln_sd = sqrt(log(1+($sd*$sd/($mean*$mean))));	 
+    $R_command_line = "R --vanilla -q --slave -e 'rlnorm(1, mean=". $ln_mean . ", sd=" . $ln_sd . ")'"; 
     $time_string = exec($R_command_line);
     list($s,$time) = explode(' ', $time_string);
     settype($time, "integer");
@@ -250,4 +250,15 @@ class Department
   public $aux_specialisms = array();
 
 };
+/*
+  Some common functions
+*/
+function SamplePoissonDistribution($mean)
+{
+  $R_command_line = "R --vanilla -q --slave -e 'rpois(1, ". $mean . ")'";
+  $string = exec($R_command_line);
+  list($s,$value) = explode(' ', $string);
+  settype($value, "integer");
+  return $value; 
+}
 ?>

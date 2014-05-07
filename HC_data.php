@@ -1,6 +1,6 @@
 <?php
 /*
-  OR_PASU_Generator version 1.0 September 4, 2013 
+  OR_PASU_Generator version 2.0 May 4, 2014 
   -------------------------------------------------------------------------------------------------------------------------------------------
   This file defines the data necessary to generate the instances. It is part of the instance generator used in:
  
@@ -12,7 +12,7 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 
-  Copyright (C) 2013 SaTT Group, DIEGM, University of Udine. 
+  Copyright (C) 2014 SaTT Group, DIEGM, University of Udine. 
   -------------------------------------------------------------------------------------------------------------------------------------------
 */
 
