@@ -2,19 +2,20 @@
 
 This repository contains instances, generator, solutions, and validator for the problem defined in the paper *The Dynamic Patient Admission Scheduling with Operating Room Constraints, Flexible Horizon, and Patient Delays. Submitted for publication* by Sara Ceschia and Andrea Schaerf, currently under revision. 
 
-This is a temporary version of the file, meant for reviewers' use only.
+This is a temporary version of the site, meant for reviewers' use only.
 
 ## Generator
 
 The generator OrPasXMLGenerator.php generates instances of any size by running:
-    $ ./OrPasXMLGenerator.php <departments> <rooms> <features> <patients> <days> <or_rooms>
+
+	$ ./OrPasXMLGenerator.php <departments> <rooms> <features> <patients> <days> <or_rooms>
 
 The files `HC_classes.php` and `HC_Data.php` are necessary to run the generator.
 
 ##Instances
 
-Generated instances are stored in folder Instances. Each instance is validated again the `OrPasInstance.xsd` XML schema. 
-They are split into 5 families with the following main features:
+Generated instances are stored in folder `Instances`. Each instance is validated again the `OrPasInstance.xsd` XML schema. 
+They are split into 6 families with the following main features:
 
 | Family | Rooms | Departiments | Operating Rooms | Specialisms | Treatments | Patients | Days
 | :------| ------:| ------:| ------:| ------:| ------:| ------:| 
@@ -27,7 +28,7 @@ They are split into 5 families with the following main features:
 
 ## Results
 
-### Results of the dynamic (regular) solver in its best configuration
+### Results of the dynamic (regular) solver in its best parameter configuration
 
 
 | Instance | Avg     | Dev     | Med     | Best    
@@ -64,7 +65,7 @@ They are split into 5 families with the following main features:
 | or_pas_dept6_long04 | 340457.53 | 2140.44 | 340116 | 336353	
 
 
-### Results of the static (crystal-ball) solver in its best configuration
+### Results of the static (crystal-ball) solver in its best parameter configuration
 
 | Instance | Avg     | Dev     | Med     | Best    
 | :--------  | ---:|  ---:|  ---:|  ----: | 
@@ -102,9 +103,9 @@ They are split into 5 families with the following main features:
 
 ## Solutions
 
-Best solutions are available from the folders DynamicSolutions and StaticSolutions for the two solvers, respectively.
+Best solutions are available in the folders `DynamicSolutions` and `StaticSolutions` for the two solvers, respectively.
 Each solution is validated against the `OrPasSolution.xsd` XML schema.
 
 ## Validator
 
-The solution validator is available as a C++ source file in `or_pas_validator.cc`. The compilation command is provided on top of the file as a comment. The library libxml++ needs to be installed.
+The solution validator is available as the C++ source file `or_pas_validator.cc`. The compilation command is provided on top of the file as a comment. The library `libxml++` needs to be installed.
