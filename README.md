@@ -2,8 +2,6 @@
 
 This repository contains instances, generator, solutions, and validator for the problem defined in the paper *The Dynamic Patient Admission Scheduling with Operating Room Constraints, Flexible Horizon, and Patient Delays. Submitted for publication* by Sara Ceschia and Andrea Schaerf, currently under revision. 
 
-This is a temporary version of the site, meant for reviewers' use only.
-
 ## Generator
 
 The generator OrPasXMLGenerator.php generates instances of any size by running:
