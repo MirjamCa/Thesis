@@ -1,6 +1,7 @@
 # The Dynamic Patient Admission Scheduling with Operating Room Constraints, Flexible Horizon, and Patient Delays
 
-This repository contains instances, generator, solutions, and validator for the problem defined in the paper *The Dynamic Patient Admission Scheduling with Operating Room Constraints, Flexible Horizon, and Patient Delays. Submitted for publication* by Sara Ceschia and Andrea Schaerf, currently under revision. 
+This repository contains instances, generator, solutions, and validator for the problem defined in the paper *The Dynamic Patient Admission Scheduling with Operating Room Constraints, Flexible Horizon, and Patient Delays* by Sara Ceschia and Andrea Schaerf.
+Journal of Scheduling, 2014 [online first](http://link.springer.com/article/10.1007%2Fs10951-014-0407-8).
 
 ## Generator
 
@@ -15,7 +16,7 @@ The files `HC_classes.php` and `HC_Data.php` are necessary to run the generator.
 Generated instances are stored in folder `Instances`. Each instance is validated again the `OrPasInstance.xsd` XML schema. 
 They are split into 6 families with the following main features:
 
-| Family | Rooms | Departiments | Operating Rooms | Specialisms | Treatments | Patients | Days
+| Family | Rooms | Departments | Operating Rooms | Specialisms | Treatments | Patients | Days
 | :------| ------:| ------:| ------:| ------:| ------:| ------:| 
 | Short1 | 25 | 2 | 2 | 9 | 15 | 391-439 | 14
 | Short2 | 50 | 4 | 4 | 18 | 25 | 574-644 | 14
