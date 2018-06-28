@@ -3,7 +3,7 @@
 // date: May 4, 2014
 // author: Sara Ceschia & Andrea Schaerf
 // OS: ubuntu linux
-// compile with: g++ -Wall -O3 -I/usr/include/libxml2 -I/usr/include/glibmm-2.4 -I/usr/lib/x86_64-linux-gnu/glibmm-2.4/include -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/libxml++-2.6 -I/usr/lib/libxml++-2.6/include -o or_pas_validator or_pas_validator.cc -lxml++-2.6 -lglibmm-2.4
+// g++ or_pas_validator.cc -o or_pas_validator `pkg-config libxml++-2.6 --cflags --libs` -std=c++11 
 // run with: or_pas_validator <instance_file> <solution_file>
 #include <iostream>
 #include <string>
@@ -950,12 +950,13 @@ void PASU_Manager :: ComputePreprocessing()
 	  total_room_requests++;
     }
 
+  for (d = 0; d < OriginalPlanningHorizon(); d++)	  
+    for (sp = 0; sp < num_specialisms; sp++)
+      total_or_slots += OrSlots(d, sp);
+
   for (d = 0; d < num_days; d++)	  
     for (sp = 0; sp < num_specialisms; sp++)
-      {      
-	day_or_slots[d] += OrSlots(d, sp);      
-	total_or_slots += OrSlots(d, sp);
-      }
+      day_or_slots[d] += OrSlots(d, sp); 
 
   // compute lower bound
   vector<int> patient_min_cost(num_patients, -1);
@@ -1299,8 +1300,7 @@ void PASU_Manager::ReadSolution(string out_file)
  
  assert(current_day == 0);
  assert(static_cast<int>(current_day) == FindDay(first_day));
- // assert(static_cast<int>(current_day) == FindDay(day));// FIX ME
-
+ 
  result_nodes = main_out_solution_node->find("./patients_scheduling");
  const xmlpp::Element* patients_scheduling = dynamic_cast<const xmlpp::Element*>(*result_nodes.begin());
  
@@ -1598,7 +1598,7 @@ pair<unsigned,unsigned> PASU_Manager::ComputeCost()
   for (d = 0; d < OriginalPlanningHorizon(); d++)
     {
       for (r = 0; r < num_rooms; r++)
-	if (occupancy[r][d] < GetRoom(r)->capacity)
+	if (occupancy[r][d] <= GetRoom(r)->capacity)
 	  idle_room_cost -= occupancy[r][d];
     }
  idle_room_cost *= IDLE_ROOM_CAPACITY_WEIGHT;
