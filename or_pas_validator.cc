@@ -418,6 +418,7 @@ protected:
   unsigned total_or_requests, total_or_slots, total_room_requests;
 
   // costs
+  unsigned max_admission_viol;
   unsigned patient_room_cost, gender_cost, transfer_cost, delay_cost, overcrowd_risk_cost, violations;
   unsigned properties_viol, preference_viol, department_viol, room_fixed_gender_viol, capacity_viol;
   unsigned idle_room_cost;
@@ -1070,6 +1071,7 @@ void PASU_Manager:: RepeatMSS()
 void PASU_Manager::WriteCosts(ostream& os)
 {
   os << "VIOLATIONS:" << endl;
+  os << "Max admission: " << max_admission_viol << endl;
   os << "Capacity = " << capacity_viol << endl;
   os << "Operating room = " << operating_room_capacity_viol << endl;
 
@@ -1359,6 +1361,7 @@ pair<unsigned,unsigned> PASU_Manager::ComputeCost()
   vector<unsigned> day_or_occupancy(num_days,0);
 
   violations = 0;
+  max_admission_viol = 0;
   capacity_viol = 0;
   patient_room_cost = 0;
   gender_cost = 0;
@@ -1424,7 +1427,7 @@ pair<unsigned,unsigned> PASU_Manager::ComputeCost()
 	    }
 	} 
     }
-
+  
   // room capacity cost
   for (r = 0; r < num_rooms; r++)
     for (d = 0; d < num_days; d++)
@@ -1563,7 +1566,20 @@ pair<unsigned,unsigned> PASU_Manager::ComputeCost()
 	  PlannedAdmissionDay(p) > GetPatient(p)->admission_day)
 	delay_cost += PlannedAdmissionDay(p) - GetPatient(p)->admission_day;
     }
-  delay_cost *= DELAY_WEIGHT;  
+  delay_cost *= DELAY_WEIGHT;
+
+
+  // max admission violations
+  for (p = 0; p < num_patients; p++)
+    {
+      if ((Registered(p) || Arrived(p) || Discharged(p)) && // contiamo tutti i costi
+	  PlannedAdmissionDay(p) > GetPatient(p)->max_admission_day)
+	{
+	  max_admission_viol += PlannedAdmissionDay(p) - GetPatient(p)->max_admission_day;
+	  violations += PlannedAdmissionDay(p) - GetPatient(p)->max_admission_day;
+	  cerr << "VIOLATION: Patient " << GetPatient(p)->name << " admitted on day " <<
+	    PlannedAdmissionDay(p) << ", with maximum admission day " <<  GetPatient(p)->max_admission_day << endl;}
+    }
 
   // overcrowd risk cost
 
