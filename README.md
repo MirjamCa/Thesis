@@ -1,7 +1,17 @@
 # The Dynamic Patient Admission Scheduling with Operating Room Constraints, Flexible Horizon, and Patient Delays
 
-This repository contains instances, generator, solutions, and validator for the problem defined in the paper *The Dynamic Patient Admission Scheduling with Operating Room Constraints, Flexible Horizon, and Patient Delays* by Sara Ceschia and Andrea Schaerf.
-Journal of Scheduling, 2014 [online first](http://link.springer.com/article/10.1007%2Fs10951-014-0407-8).
+This repository contains instances, generator, solutions, and
+validator for the problem defined in the paper *The Dynamic Patient
+Admission Scheduling with Operating Room Constraints, Flexible
+Horizon, and Patient Delays* by Sara Ceschia and Andrea
+Schaerf. Journal of Scheduling (2016) 19:
+377(https://doi.org/10.1007/s10951-014-0407-8).
+
+We would like to thank Yi-Hang Zhu, Tulio Toffolo, Wim Vancroonenburg
+and Greet Vanden Berghe for reporting to us some bugs on the
+computation of the solution cost.
+The source code and the validator have been corrected accordingly and
+we re-run all the experiments, whose results are reported on the tables below.
 
 ## Generator
 
@@ -29,75 +39,73 @@ They are split into 6 families with the following main features:
 
 ### Results of the dynamic (regular) solver in its best parameter configuration
 
-
 | Instance | Avg     | Dev     | Med     | Best    
 | :--------  | ---:|  ---:|  ---:|  ----: | 
-| or_pas_dept2_short00 | 84743.13 | 434.93 | 84697	| 83750	
-| or_pas_dept2_short01 | 76421.17 | 672.82 | 76413	| 75185	
-| or_pas_dept2_short02 | 85644.67  | 451.86 | 85614	| 84743	
-| or_pas_dept2_short03 | 85578.17  | 694.82 | 85734	| 84041	
-| or_pas_dept2_short04 | 80065.43  |  542.35 | 80110 | 78979	
-| or_pas_dept4_short00 | 162431.33  | 736.19 | 162445 | 160908	
-| or_pas_dept4_short01 | 131807.20 | 829.73 | 131874 | 130417	
-| or_pas_dept4_short02 | 130755.77 | 794.25 | 130598 | 129365	
-| or_pas_dept4_short03 | 132371.20 | 1066.50 | 132471 | 130044	
-| or_pas_dept4_short04 | 118835.60 | 809.96 | 118975 | 116781	
-| or_pas_dept6_short00 | 211538.80 | 1186.79 | 211655 | 209289	
-| or_pas_dept6_short01 | 231615.80 | 1395.02 | 232004 | 229258	
-| or_pas_dept6_short02 | 227800.30 | 1732.82 | 227598 | 223933	
-| or_pas_dept6_short03 | 189188.20 | 1033.87 | 189196 | 186491	
-| or_pas_dept6_short04 | 211278.67 | 906.75 | 211612 | 208996	
-| or_pas_dept2_long00 | 175608.50 | 1778.51 | 175958 | 172398	
-| or_pas_dept2_long01 | 185516.37 | 1351.85 | 185570 | 183134	
-| or_pas_dept2_long02 | 162102.70 | 1237.24 | 162007 | 159459	
-| or_pas_dept2_long03 | 141373.47 | 1221.96 | 141613 | 139098	
-| or_pas_dept2_long04 | 181073.43 | 861.35 | 181237 | 179153	
-| or_pas_dept4_long00 | 229260.90 | 1605.24 | 229615 | 225738	
-| or_pas_dept4_long01 | 256394.27 | 1802.09 | 256616 | 253143	
-| or_pas_dept4_long02 | 283645.53 | 1917.39 | 283635 | 279354	
-| or_pas_dept4_long03 | 390986.00 | 2366.04 | 391276 | 385649	
-| or_pas_dept4_long04 | 303337.23 | 2711.70 | 303173 | 298670	
-| or_pas_dept6_long00 | 521369.50 | 4009.90 | 521248 | 514810	
-| or_pas_dept6_long01 | 551616.71 | 5718.19 | 553391 | 541950	
-| or_pas_dept6_long02 | 455385.47 | 3625.85 | 455504 | 447008	
-| or_pas_dept6_long03 | 470707.24 | 2898.82 | 470723 | 465630	
-| or_pas_dept6_long04 | 340457.53 | 2140.44 | 340116 | 336353	
-
+| or_pas_dept2_short00 | 57906.39 | 418.93 | 57837 | 57088
+| or_pas_dept2_short01 | 61897.74 | 705.05 | 61792 | 60482
+| or_pas_dept2_short02 | 46469.58 | 395.60 | 46383 | 45600
+| or_pas_dept2_short03 | 65014.68 | 680.09 | 64942 | 63825
+| or_pas_dept2_short04 | 44318.84 | 398.31 | 44301 | 43111
+| or_pas_dept4_short00 | 135772.60 | 690.62 | 135861 | 134426
+| or_pas_dept4_short01 | 105933.68 | 1017.42 | 105748 | 103554
+| or_pas_dept4_short02 | 109126.37 | 775.72 | 109036 | 107697
+| or_pas_dept4_short03 | 99476.411 | 969.37 | 99319 | 98023
+| or_pas_dept4_short04 | 92909.82 | 826.81 | 92860 | 91231
+| or_pas_dept6_short00 | 161086.30 | 929.73 | 161055 | 158880
+| or_pas_dept6_short01 | 165602.24 | 930.55 | 165668 | 163633
+| or_pas_dept6_short02 | 165228.04 | 1378.19 | 165381 | 162297
+| or_pas_dept6_short03 | 153397.32 | 882.10 | 153312 | 151617
+| or_pas_dept6_short04 | 177889.16 | 778.41 | 177918 | 175799
+| or_pas_dept2_long00 | 145463.30 | 1766.27 | 145658 | 141610
+| or_pas_dept2_long01 | 137945.16 | 1028.02 | 137903 | 135869
+| or_pas_dept2_long02 | 136800.20 | 1609.77 | 136594 | 133727
+| or_pas_dept2_long03 | 112523.64 | 1365.98 | 112566 | 109089
+| or_pas_dept2_long04 | 106351.86 | 844.39 | 106275 | 104609
+| or_pas_dept4_long00 | 174088.28 | 1364.81 | 174166 | 170850
+| or_pas_dept4_long01 | 207159.67 | 2022.69 | 207483 | 203036
+| or_pas_dept4_long02 | 220895.89 | 1845.20 | 220997 | 217072
+| or_pas_dept4_long03 | 256604.22 | 2299.89 | 257016 | 251793
+| or_pas_dept4_long04 | 216852.85 | 2416.89 | 216968 | 208635
+| or_pas_dept6_long00 | 412807.38 | 3266.53 | 412716 | 405401
+| or_pas_dept6_long01 | 450951.08 | 4445.77 | 451416 | 439115
+| or_pas_dept6_long02 | 372260.16 | 2752.94 | 372233 | 366010
+| or_pas_dept6_long03 | 387728.40 | 2500.19 | 387791 | 382817
+| or_pas_dept6_long04 | 265879.83 | 2312.38 | 265772 | 261854
 
 ### Results of the static (crystal-ball) solver in its best parameter configuration
 
 | Instance | Avg     | Dev     | Med     | Best    
 | :--------  | ---:|  ---:|  ---:|  ----: | 
-| or_pas_dept2_short00 | 86969.97 | 371.27	 | 86947 | 86415
-| or_pas_dept2_short01 | 76610.17 | 726.20	 | 76878 | 75165
-| or_pas_dept2_short02 | 85724.30 | 241.64	 | 85723 | 85092
-| or_pas_dept2_short03 | 84421.83 | 401.52	 | 84450 | 83689
-| or_pas_dept2_short04 | 80257.10 | 265.52	 | 80306 | 79739
-| or_pas_dept4_short00 | 162274.10 | 632.75 | 162383 | 161023
-| or_pas_dept4_short01 | 128330.63 | 689.96 | 128340 | 126844
-| or_pas_dept4_short02 | 132575.83 | 723.07 | 132687 | 131031
-| or_pas_dept4_short03 | 131414.23 | 624.61 | 131541 | 130236
-| or_pas_dept4_short04 | 118685.07 | 465.52 | 118776 | 117767
-| or_pas_dept6_short00 | 209519.80 | 520.71 | 209520 | 208408
-| or_pas_dept6_short01 | 229400.30 | 848.78 | 229318 | 228126
-| or_pas_dept6_short02 | 219940.23 | 1091.77 | 220135 | 217641
-| or_pas_dept6_short03 | 187157.43 | 786.63 | 187121 | 185379
-| or_pas_dept6_short04 | 213279.27 | 648.66 | 213187 | 211735
-| or_pas_dept2_long00 | 166753.43 | 927.98 | 166935 | 165043
-| or_pas_dept2_long01 | 184473.77 | 878.19 | 184515 | 182704
-| or_pas_dept2_long02 | 154540.87 | 862.10 | 154476 | 152948
-| or_pas_dept2_long03 | 139857.17 | 912.99 | 139735 | 138120
-| or_pas_dept2_long04 | 182489.73 | 380.84 | 182475 | 181918
-| or_pas_dept4_long00 | 226703.83 | 1029.53 | 226981 | 224403
-| or_pas_dept4_long01 | 255247.37 | 1063.52 | 255400 | 253048
-| or_pas_dept4_long02 | 277658.17 | 762.86 | 277606 | 275849
-| or_pas_dept4_long03 | 375461.07 | 1732.87 | 375615 | 371729
-| or_pas_dept4_long04 | 289296.03 | 1586.19 | 289651 | 286014
-| or_pas_dept6_long00 | 495248.93 | 1405.87 | 495013 | 492893
-| or_pas_dept6_long01 | 534763.67 | 1652.99 | 535394 | 532499
-| or_pas_dept6_long02 | 430484.60 | 1696.84 | 430695 | 426626
-| or_pas_dept6_long03 | 462507.63 | 1599.33 | 462225 | 459018
-| or_pas_dept6_long04 | 340267.20 | 1138.79 | 340102 | 337876
+| or_pas_dept2_short00 | 58680.51 | 293.23 | 58675 | 58081
+| or_pas_dept2_short01 | 62004.45 | 647.72 | 62043 | 60487
+| or_pas_dept2_short02 | 46107.98 | 186.59 | 46102 | 45476
+| or_pas_dept2_short03 | 63288.43 | 300.22 | 63292 | 62420
+| or_pas_dept2_short04 | 43867.27 | 266.38 | 43879 | 43252
+| or_pas_dept4_short00 | 135187.06 | 467.68 | 135249 | 134198
+| or_pas_dept4_short01 | 101130.65 | 431.88 | 101059 | 100284
+| or_pas_dept4_short02 | 109100.10 | 488.88 | 109171 | 107977
+| or_pas_dept4_short03 | 97679.63 | 386.94 | 97632 | 96869
+| or_pas_dept4_short04 | 91632.33 | 430.59 | 91600 | 90799
+| or_pas_dept6_short00 | 158647.02 | 442.15 | 158680 | 157732
+| or_pas_dept6_short01 | 163009.90 | 595.52 | 162929 | 161705
+| or_pas_dept6_short02 | 154832.88 | 733.25 | 154939 | 153438
+| or_pas_dept6_short03 | 150459.28 | 588.58 | 150465 | 148935
+| or_pas_dept6_short04 | 177892.48 | 464.72 | 177921 | 176651
+| or_pas_dept2_long00 | 135489.74 | 1010.33 | 135492 | 133418
+| or_pas_dept2_long01 | 135713.36 | 769.59 | 135786 | 133352
+| or_pas_dept2_long02 | 128645.52 | 661.63 | 128537 | 127304
+| or_pas_dept2_long03 | 108735.14 | 797.23 | 108635 | 107049
+| or_pas_dept2_long04 | 106707.16 | 383.41 | 106756 | 105790
+| or_pas_dept4_long00 | 168485.92 | 995.52 | 168367 | 166888
+| or_pas_dept4_long01 | 202896.66 | 1016.09 | 203026 | 200683
+| or_pas_dept4_long02 | 213373.73 | 578.12 | 213377 | 212172
+| or_pas_dept4_long03 | 238857.12 | 1760.31 | 238729 | 235303
+| or_pas_dept4_long04 | 197818.22 | 1341.73 | 197804 | 195143
+| or_pas_dept6_long00 | 385031.02 | 2118.53 | 385123 | 379907
+| or_pas_dept6_long01 | 426449.71 | 2092.63 | 426679 | 421770
+| or_pas_dept6_long02 | 344382.53 | 1843.91 | 344351 | 340338
+| or_pas_dept6_long03 | 374972.76 | 1308.84 | 374693 | 373143
+| or_pas_dept6_long04 | 261185.47 | 1139.60 | 261118 | 258819
 
 
 ## Solutions
