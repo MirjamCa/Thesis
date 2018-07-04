@@ -4,8 +4,7 @@ This repository contains instances, generator, solutions, and
 validator for the problem defined in the paper *The Dynamic Patient
 Admission Scheduling with Operating Room Constraints, Flexible
 Horizon, and Patient Delays* by Sara Ceschia and Andrea
-Schaerf. Journal of Scheduling (2016) 19:
-377(https://doi.org/10.1007/s10951-014-0407-8).
+Schaerf. Journal of Scheduling (2016) 19:377 (https://doi.org/10.1007/s10951-014-0407-8).
 
 We would like to thank Yi-Hang Zhu, Tulio Toffolo, Wim Vancroonenburg
 and Greet Vanden Berghe for reporting to us some bugs on the
