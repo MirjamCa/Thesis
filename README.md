@@ -6,10 +6,11 @@ Admission Scheduling with Operating Room Constraints, Flexible
 Horizon, and Patient Delays* by Sara Ceschia and Andrea
 Schaerf. Journal of Scheduling (2016) 19:377 (https://doi.org/10.1007/s10951-014-0407-8).
 
-We would like to thank Yi-Hang Zhu, Tulio Toffolo, Wim Vancroonenburg
-and Greet Vanden Berghe for reporting to us some bugs on the
-computation of the solution cost.
-The source code and the validator have been corrected accordingly and
+## Update (July, 2018)
+
+As pointed out by Yi-Hang Zhu, Tulio Toffolo, Wim Vancroonenburg and
+Greet Vanden Berghe, there were some bugs on the computation of the
+solution cost. The source code and the validator have been corrected accordingly and
 we re-run all the experiments, whose results are reported on the tables below.
 
 ## Generator
